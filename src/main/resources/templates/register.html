@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>在线留言板 - 注册</title>
+  <style>
+    .register-box {width: 300px; margin: 100px auto; text-align: center;}
+    .input-item {margin: 10px 0;}
+    input {width: 200px; padding: 8px;}
+    button {padding: 8px 20px; background: #28a745; color: white; border: none; border-radius: 4px;}
+  </style>
+</head>
+<body>
+<div class="register-box">
+  <h2>用户注册</h2>
+  <form action="/user/register" method="post">
+    <div class="input-item">
+      <input type="text" name="username" placeholder="请输入账号" required>
+    </div>
+    <div class="input-item">
+      <input type="password" name="password" placeholder="请输入密码" required>
+    </div>
+    <div class="input-item">
+      <input type="text" name="nickname" placeholder="请输入昵称（选填）">
+    </div>
+    <button type="submit">注册</button>
+  </form>
+  <p><a href="/user/login">已有账号？点击登录</a></p>
+</div>
+</body>
+</html>
