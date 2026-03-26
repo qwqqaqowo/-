@@ -5,6 +5,8 @@ import com.example.onlinetalk.entity.User;
 import com.example.onlinetalk.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -24,5 +26,16 @@ public class CommentController {
         comment.setCreateTime(new Date());
         commentService.addComment(comment);
         return "redirect:/post/detail/" + comment.getPostId(); // 评论成功跳帖子详情
+    }
+
+    @GetMapping("/delete/{id}")
+    public String delete(@PathVariable Integer id, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        Integer cUserId = commentService.getUserIdByCommentId(id);
+
+        if (user.getRole().equals("admin") || cUserId.equals(user.getId())) {
+            commentService.deleteById(id);
+        }
+        return "redirect:/post/list";
     }
 }

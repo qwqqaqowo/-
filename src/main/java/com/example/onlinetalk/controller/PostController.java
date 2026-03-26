@@ -3,31 +3,46 @@ package com.example.onlinetalk.controller;
 import com.example.onlinetalk.entity.Post;
 import com.example.onlinetalk.entity.User;
 import com.example.onlinetalk.service.PostService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-
+import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 import java.util.Date;
+import java.util.List;
 
 @Controller
 @RequestMapping("/post")
 public class PostController {
-    @Autowired
-    private PostService postService;
 
-    @GetMapping("/list")
-    public String list(Model model) {
-        model.addAttribute("posts", postService.listAllPosts());
-        return "postList"; // 跳转到帖子列表页
+    private final PostService postService;
+
+    public PostController(PostService postService) {
+        this.postService = postService;
     }
+
+    // ====================== 【唯一正确的列表方法】 ======================
+    @GetMapping("/list")
+    public String list(
+            @RequestParam(defaultValue = "1") Integer pageNum,
+            @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(defaultValue = "") String keyword,
+            Model model) {
+
+        List<Post> posts = postService.listByPage(keyword, pageNum, pageSize);
+        int total = postService.count(keyword);
+        int pages = (total + pageSize - 1) / pageSize;
+
+        model.addAttribute("posts", posts);
+        model.addAttribute("pageNum", pageNum);
+        model.addAttribute("pages", pages);
+        model.addAttribute("keyword", keyword);
+        return "postList";
+    }
+
 
     @GetMapping("/add")
     public String toAdd() {
-        return "addPost"; // 跳转到发帖页
+        return "addPost";
     }
 
     @PostMapping("/add")
@@ -36,13 +51,24 @@ public class PostController {
         post.setUserId(user.getId());
         post.setCreateTime(new Date());
         postService.addPost(post);
-        return "redirect:/post/list"; // 发帖成功跳列表页
+        return "redirect:/post/list";
     }
 
     @GetMapping("/detail/{id}")
-    public String detail(Integer id, Model model) {
+    public String detail(@PathVariable Integer id, Model model) {
         model.addAttribute("post", postService.getPostById(id));
         model.addAttribute("comments", postService.getCommentsByPostId(id));
-        return "postDetail"; // 跳转到帖子详情页
+        return "postDetail";
+    }
+
+    @GetMapping("/delete/{id}")
+    public String delete(@PathVariable Integer id, HttpSession session) {
+        User loginUser = (User) session.getAttribute("user");
+        Integer postUserId = postService.getUserIdByPostId(id);
+
+        if (loginUser.getRole().equals("admin") || postUserId.equals(loginUser.getId())) {
+            postService.deleteById(id);
+        }
+        return "redirect:/post/list";
     }
 }

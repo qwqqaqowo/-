@@ -13,4 +13,11 @@ public class CommentService {
     public void addComment(Comment comment) {
         commentMapper.addComment(comment);
     }
+
+    public void deleteById(Integer id) {
+        commentMapper.deleteById(id);
+    }
+    public Integer getUserIdByCommentId(Integer id) {
+        return commentMapper.getUserIdByCommentId(id);
+    }
 }

@@ -1,33 +1,59 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <title>留言列表 - 在线留言板</title>
-  <style>
-    .header {text-align: center; margin: 20px 0;}
-    .post-item {width: 600px; margin: 20px auto; padding: 15px; border: 1px solid #eee; border-radius: 8px;}
-    .post-title {color: #007bff; text-decoration: none; font-size: 18px;}
-    .post-content {margin: 10px 0; color: #333;}
-    .post-time {color: #999; font-size: 12px;}
-    .btn {padding: 8px 15px; text-decoration: none; color: white; border-radius: 4px;}
-    .btn-add {background: #007bff;}
-    .btn-logout {background: #dc3545; float: right;}
-  </style>
+  <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-<div class="header">
-  <h1>在线留言板</h1>
-  <a href="/post/add" class="btn btn-add">发布新留言</a>
-  <a href="/user/logout" class="btn btn-logout">退出登录</a>
-</div>
-<div class="post-list">
-  <div th:each="post : ${posts}">
-    <div class="post-item">
-      <a th:href="@{/post/detail/{id}(id=${post.id})}" class="post-title" th:text="${post.title}"></a>
-      <p class="post-content" th:text="${post.content}"></p>
-      <p class="post-time" th:text="${#dates.format(post.createTime, 'yyyy-MM-dd HH:mm')}"></p>
+
+<div class="container">
+  <div class="header">
+    <h1>在线留言板</h1>
+    <div class="btn-group">
+      <a href="/post/add" class="btn btn-add">发布新留言</a>
+      <a href="/user/logout" class="btn btn-logout">退出登录</a>
     </div>
   </div>
+
+  <div class="search-box">
+    <form action="/post/list" method="get">
+      <input type="text" name="keyword" placeholder="请输入标题搜索" th:value="${keyword}">
+      <button type="submit" class="search-btn">搜索</button>
+    </form>
+  </div>
+
+  <div class="post-list">
+    <div class="post-item" th:each="post : ${posts}">
+      <div class="post-title">
+        <a th:href="@{/post/detail/{id}(id=${post.id})}" th:text="${post.title}"></a>
+
+        <a th:if="${session.user != null && (session.user.role == 'admin' || session.user.id == post.userId)}"
+           th:href="@{/post/delete/{id}(id=${post.id})}"
+           class="delete-btn"
+           onclick="return confirm('确定删除？')">
+          删除
+        </a>
+      </div>
+
+      <div class="post-content" th:text="${post.content}"></div>
+      <div class="post-time">
+        作者：[[${post.nickname}]] • [[${#dates.format(post.createTime, 'yyyy-MM-dd HH:mm')}]]
+      </div>
+    </div>
+  </div>
+
+
+  <div class="page-box">
+    <a th:href="@{/post/list(pageNum=1,keyword=${keyword})}">首页</a>
+    <a th:href="@{/post/list(pageNum=${pageNum-1},keyword=${keyword})}">上一页</a>
+
+    <span class="page-info" th:text="${pageNum}+'/'+${pages}"></span>
+
+    <a th:href="@{/post/list(pageNum=${pageNum+1},keyword=${keyword})}">下一页</a>
+    <a th:href="@{/post/list(pageNum=${pages},keyword=${keyword})}">尾页</a>
+  </div>
 </div>
+
 </body>
 </html>

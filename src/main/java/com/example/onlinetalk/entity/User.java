@@ -9,6 +9,7 @@ public class User {
     private String nickname;
     private Date createTime;
 
+    private String role;
     public Integer getId() {
         return id;
     }
@@ -47,5 +48,13 @@ public class User {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

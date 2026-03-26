@@ -9,6 +9,8 @@ public class Post {
     private Integer userId;
     private Date createTime;
 
+    private String nickname;
+
     public Integer getId() {
         return id;
     }
@@ -47,5 +49,13 @@ public class Post {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 }
